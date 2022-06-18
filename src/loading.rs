@@ -5,12 +5,10 @@ use bevy_kira_audio::AudioSource;
 
 pub struct LoadingPlugin;
 
-/// This plugin loads all assets using [AssetLoader] from a third party bevy plugin
-/// Alternatively you can write the logic to load assets yourself
-/// If interested, take a look at https://bevy-cheatbook.github.io/features/assets.html
 impl Plugin for LoadingPlugin {
     fn build(&self, app: &mut App) {
         AssetLoader::new(GameState::Loading)
+            .with_dynamic_asset_collection_file("dynamic.assets")
             .with_collection::<FontAssets>()
             .with_collection::<AudioAssets>()
             .with_collection::<TextureAssets>()
@@ -18,9 +16,6 @@ impl Plugin for LoadingPlugin {
             .build(app);
     }
 }
-
-// the following asset collections will be loaded during the State `GameState::Loading`
-// when done loading, they will be inserted as resources (see https://github.com/NiklasEi/bevy_asset_loader)
 
 #[derive(AssetCollection)]
 pub struct FontAssets {
@@ -30,12 +25,16 @@ pub struct FontAssets {
 
 #[derive(AssetCollection)]
 pub struct AudioAssets {
-    #[asset(path = "audio/flying.ogg")]
-    pub flying: Handle<AudioSource>,
+    #[asset(path = "audio/background.ogg")]
+    pub background: Handle<AudioSource>,
 }
 
 #[derive(AssetCollection)]
 pub struct TextureAssets {
-    #[asset(path = "textures/bevy.png")]
-    pub texture_bevy: Handle<Image>,
+    #[asset(key = "chicken")]
+    pub chicken: Handle<Image>,
+    #[asset(key = "pig")]
+    pub pig: Handle<Image>,
+    #[asset(key = "cow")]
+    pub cow: Handle<Image>,
 }

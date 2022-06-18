@@ -1,0 +1,11 @@
+({
+    "chicken": File (
+        path: "textures/player.png",
+    ),
+    "pig": File (
+        path: "textures/tree.png",
+    ),
+    "cow": File (
+        path: "textures/zombie.png",
+    ),
+})
