@@ -1,19 +1,19 @@
+mod animal;
 mod audio;
+mod farm;
 mod loading;
 mod menu;
-mod farm;
-mod animal;
 
 use crate::audio::InternalAudioPlugin;
 use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
 
+use crate::animal::AnimalPlugin;
+use crate::farm::FarmPlugin;
 use bevy::app::App;
 #[cfg(debug_assertions)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
-use crate::animal::AnimalPlugin;
-use crate::farm::FarmPlugin;
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash)]
 enum GameState {
@@ -42,6 +42,11 @@ impl Plugin for GamePlugin {
     }
 }
 
+#[derive(Component)]
+pub struct MainCamera;
+
 fn prepare(mut commands: Commands) {
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+    commands
+        .spawn_bundle(OrthographicCameraBundle::new_2d())
+        .insert(MainCamera);
 }
