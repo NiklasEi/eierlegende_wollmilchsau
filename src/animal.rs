@@ -21,21 +21,59 @@ impl Plugin for AnimalPlugin {
 
 #[derive(Component)]
 pub struct Animal {
-    velocity: Vec2,
+    generation: AnimalGeneration,
+    state: AnimalState,
+}
+
+#[derive(PartialEq)]
+pub enum AnimalGeneration {
+    Chicken,
+    Cow,
+    Pig,
+}
+
+impl AnimalGeneration {
+    fn next(&self) -> Option<Self> {
+        match self {
+            AnimalGeneration::Chicken => Some(AnimalGeneration::Cow),
+            AnimalGeneration::Cow => Some(AnimalGeneration::Pig),
+            AnimalGeneration::Pig => None,
+        }
+    }
+
+    fn get_texture(&self, textures: &TextureAssets) -> Handle<Image> {
+        match self {
+            AnimalGeneration::Chicken => textures.chicken.clone(),
+            AnimalGeneration::Cow => textures.cow.clone(),
+            AnimalGeneration::Pig => textures.pig.clone(),
+        }
+    }
+}
+
+pub enum AnimalState {
+    Idle,
+    Moving { velocity: Vec2 },
+    Merging,
 }
 
 impl Animal {
     pub(crate) fn random() -> Self {
         Animal {
-            velocity: Vec2::new((random::<f32>() * 2.) - 1., (random::<f32>() * 2.) - 1.),
+            generation: AnimalGeneration::Chicken,
+            state: AnimalState::Moving {
+                velocity: Vec2::new((random::<f32>() * 2.) - 1., (random::<f32>() * 2.) - 1.)
+                    .normalize(),
+            },
         }
     }
 }
 
 fn move_animals(mut animals: Query<(&mut Transform, &Animal), Without<Picked>>) {
     for (mut transform, animal) in animals.iter_mut() {
-        transform.translation.x += animal.velocity.x;
-        transform.translation.y += animal.velocity.y;
+        if let AnimalState::Moving { velocity } = animal.state {
+            transform.translation.x += velocity.x;
+            transform.translation.y += velocity.y;
+        }
     }
 }
 
@@ -57,7 +95,7 @@ pub struct Picked;
 
 fn pick_up_animal(
     mut commands: Commands,
-    animals: Query<(Entity, &Transform), (With<Animal>, Without<Picked>)>,
+    animals: Query<(Entity, &Transform, &Animal), Without<Picked>>,
     windows: Res<Windows>,
     cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
     mouse_input: Res<Input<MouseButton>>,
@@ -77,35 +115,43 @@ fn drop_animal(
     mut commands: Commands,
     textures: Res<TextureAssets>,
     mouse_input: Res<Input<MouseButton>>,
-    animals: Query<(Entity, &Transform), (With<Animal>, Without<Picked>)>,
-    picked_animals: Query<Entity, With<Picked>>,
+    animals: Query<(Entity, &Transform, &Animal), Without<Picked>>,
+    picked_animal: Query<(Entity, &Animal), With<Picked>>,
     windows: Res<Windows>,
     cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
 ) {
     if !mouse_input.just_released(MouseButton::Left) {
         return;
     }
-    if let Some(position) = get_world_coordinates(&windows, &cameras) {
-        if let Some(entity) = get_animal_in_reach(&animals, &position, 32.) {
-            commands.entity(entity).despawn();
-            commands
-                .spawn_bundle(SpriteBundle {
-                    texture: textures.cow.clone(),
-                    transform: animals.get(entity).unwrap().1.clone(),
-                    ..default()
-                })
-                .insert(Animal::random());
-            for entity in picked_animals.iter() {
-                commands.entity(entity).despawn();
+    if let Ok((picked_animal_entity, picked_animal)) = picked_animal.get_single() {
+        if let Some(position) = get_world_coordinates(&windows, &cameras) {
+            if let Some(dropped_on_animal) = get_animal_in_reach(&animals, &position, 32.) {
+                if picked_animal.generation == animals.get(dropped_on_animal).unwrap().2.generation
+                {
+                    if let Some(next_generation) = picked_animal.generation.next() {
+                        commands.entity(dropped_on_animal).despawn();
+                        commands
+                            .spawn_bundle(SpriteBundle {
+                                texture: next_generation.get_texture(&textures),
+                                transform: animals.get(dropped_on_animal).unwrap().1.clone(),
+                                ..default()
+                            })
+                            .insert(Animal {
+                                generation: next_generation,
+                                state: AnimalState::Idle,
+                            });
+                        commands.entity(picked_animal_entity).despawn();
+                    } else {
+                        commands.entity(picked_animal_entity).remove::<Picked>();
+                    }
+                } else {
+                    commands.entity(picked_animal_entity).remove::<Picked>();
+                }
+            } else {
+                commands.entity(picked_animal_entity).remove::<Picked>();
             }
         } else {
-            for entity in picked_animals.iter() {
-                commands.entity(entity).remove::<Picked>();
-            }
-        }
-    } else {
-        for entity in picked_animals.iter() {
-            commands.entity(entity).remove::<Picked>();
+            commands.entity(picked_animal_entity).remove::<Picked>();
         }
     }
 }

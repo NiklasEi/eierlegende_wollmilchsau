@@ -40,11 +40,11 @@ fn spawn(
 }
 
 pub fn get_animal_in_reach(
-    animals: &Query<(Entity, &Transform), (With<Animal>, Without<Picked>)>,
+    animals: &Query<(Entity, &Transform, &Animal), Without<Picked>>,
     position: &Vec2,
     reach: f32,
 ) -> Option<Entity> {
-    for (entity, transform) in animals.iter() {
+    for (entity, transform, _) in animals.iter() {
         let animal_position = Vec2::new(transform.translation.x, transform.translation.y);
         if animal_position.distance(*position) < reach {
             return Some(entity);
