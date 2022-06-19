@@ -1,0 +1,14 @@
+({
+    "chicken": File (
+        path: "textures/chicken.png",
+    ),
+    "goat": File (
+        path: "textures/goat.png",
+    ),
+    "pig": File (
+        path: "textures/tree.png",
+    ),
+    "cow": File (
+        path: "textures/zombie.png",
+    ),
+})
