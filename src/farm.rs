@@ -1,5 +1,6 @@
 use crate::animal::{Animal, Picked};
 use crate::loading::TextureAssets;
+use crate::ui::Score;
 use crate::{GameState, ANIMAL_SIZE, WINDOW_HEIGHT, WINDOW_WIDTH};
 use bevy::prelude::*;
 use rand::random;
@@ -8,8 +9,11 @@ pub struct FarmPlugin;
 
 impl Plugin for FarmPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<SpawnTimer>()
-            .add_system_set(SystemSet::on_update(GameState::Playing).with_system(spawn));
+        app.init_resource::<SpawnTimer>().add_system_set(
+            SystemSet::on_update(GameState::Playing)
+                .with_system(spawn)
+                .with_system(collect_money),
+        );
     }
 }
 
@@ -59,4 +63,10 @@ pub fn get_animal_in_reach(
     }
 
     None
+}
+
+fn collect_money(mut score: ResMut<Score>, animals: Query<&Animal>, time: Res<Time>) {
+    animals.iter().for_each(|animal| {
+        score.0 += animal.generation.money_per_second() * time.delta().as_secs_f32()
+    });
 }

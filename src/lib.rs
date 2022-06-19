@@ -3,6 +3,7 @@ mod audio;
 mod farm;
 mod loading;
 mod menu;
+mod ui;
 
 use crate::audio::InternalAudioPlugin;
 use crate::loading::LoadingPlugin;
@@ -10,6 +11,7 @@ use crate::menu::MenuPlugin;
 
 use crate::animal::AnimalPlugin;
 use crate::farm::FarmPlugin;
+use crate::ui::UiPlugin;
 use bevy::app::App;
 #[cfg(debug_assertions)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
@@ -36,7 +38,8 @@ impl Plugin for GamePlugin {
             .add_plugin(MenuPlugin)
             .add_plugin(FarmPlugin)
             .add_plugin(AnimalPlugin)
-            .add_plugin(InternalAudioPlugin);
+            .add_plugin(InternalAudioPlugin)
+            .add_plugin(UiPlugin);
 
         #[cfg(debug_assertions)]
         {

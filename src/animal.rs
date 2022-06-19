@@ -53,7 +53,7 @@ impl AnimalGeneration {
         }
     }
 
-    fn triangles_per_second(&self) -> f32 {
+    pub fn money_per_second(&self) -> f32 {
         match self {
             AnimalGeneration::Chicken => 0.5,
             AnimalGeneration::Goat => 1.5,
