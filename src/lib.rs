@@ -17,6 +17,7 @@ use bevy::prelude::*;
 
 pub const WINDOW_WIDTH: f32 = 800.;
 pub const WINDOW_HEIGHT: f32 = 600.;
+pub const ANIMAL_SIZE: f32 = 64.;
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash)]
 enum GameState {

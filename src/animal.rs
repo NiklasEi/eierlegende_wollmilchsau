@@ -1,6 +1,6 @@
 use crate::farm::get_animal_in_reach;
 use crate::loading::TextureAssets;
-use crate::{GameState, MainCamera, WINDOW_HEIGHT, WINDOW_WIDTH};
+use crate::{GameState, MainCamera, ANIMAL_SIZE, WINDOW_HEIGHT, WINDOW_WIDTH};
 use bevy::prelude::*;
 use bevy::render::camera::RenderTarget;
 use rand::random;
@@ -64,59 +64,79 @@ impl AnimalGeneration {
 }
 
 pub enum AnimalState {
-    Idle,
-    Moving { velocity: Vec2 },
+    Idle { since: f64 },
+    Moving { velocity: Vec2, since: f64 },
 }
 
 impl AnimalState {
-    fn update(&mut self) {
+    fn update(&mut self, seconds_since_startup: f64) {
         match self {
-            AnimalState::Idle => {
+            AnimalState::Idle { .. } => {
                 *self = AnimalState::Moving {
+                    since: seconds_since_startup,
                     velocity: Vec2::new((random::<f32>() * 2.) - 1., (random::<f32>() * 2.) - 1.)
                         .normalize(),
                 }
             }
-            AnimalState::Moving { .. } => *self = AnimalState::Idle,
+            AnimalState::Moving { .. } => {
+                *self = AnimalState::Idle {
+                    since: seconds_since_startup,
+                }
+            }
+        }
+    }
+
+    pub fn can_update_movement(&self, seconds_since_startup: f64) -> bool {
+        match self {
+            AnimalState::Idle { since } => seconds_since_startup - since > 1.,
+            AnimalState::Moving { since, .. } => seconds_since_startup - since > 1.5,
         }
     }
 }
 
 impl Animal {
-    pub(crate) fn new() -> Self {
+    pub(crate) fn new(seconds_since_startup: f64) -> Self {
         Animal {
             generation: AnimalGeneration::Chicken,
-            state: AnimalState::Idle,
+            state: AnimalState::Idle {
+                since: seconds_since_startup,
+            },
         }
     }
 }
 
-fn update_animal_state(mut animals: Query<&mut Animal, Without<Picked>>) {
+fn update_animal_state(mut animals: Query<&mut Animal, Without<Picked>>, time: Res<Time>) {
     for mut animal in animals.iter_mut() {
+        if !animal
+            .state
+            .can_update_movement(time.seconds_since_startup())
+        {
+            continue;
+        }
         let chance = match animal.state {
-            AnimalState::Idle => 0.1,
+            AnimalState::Idle { .. } => 0.1,
             AnimalState::Moving { .. } => 0.01,
         };
         if random::<f32>() < chance {
-            animal.state.update();
+            animal.state.update(time.seconds_since_startup());
         }
     }
 }
 
 fn move_animals(mut animals: Query<(&mut Transform, &Animal), Without<Picked>>) {
     for (mut transform, animal) in animals.iter_mut() {
-        if let AnimalState::Moving { velocity } = animal.state {
+        if let AnimalState::Moving { velocity, .. } = animal.state {
             transform.translation.x += velocity.x;
             transform.translation.y += velocity.y;
 
-            transform.translation.x = transform
-                .translation
-                .x
-                .clamp(32. - WINDOW_WIDTH / 2., WINDOW_WIDTH / 2. - 32.);
-            transform.translation.y = transform
-                .translation
-                .y
-                .clamp(32. - WINDOW_HEIGHT / 2., WINDOW_HEIGHT / 2. - 32.);
+            transform.translation.x = transform.translation.x.clamp(
+                ANIMAL_SIZE / 2. - WINDOW_WIDTH / 2.,
+                WINDOW_WIDTH / 2. - ANIMAL_SIZE / 2.,
+            );
+            transform.translation.y = transform.translation.y.clamp(
+                ANIMAL_SIZE / 2. - WINDOW_HEIGHT / 2.,
+                WINDOW_HEIGHT / 2. - ANIMAL_SIZE / 2.,
+            );
         }
     }
 }
@@ -131,14 +151,14 @@ fn move_picked_animal(
             transform.translation.x = position.x;
             transform.translation.y = position.y;
 
-            transform.translation.x = transform
-                .translation
-                .x
-                .clamp(32. - WINDOW_WIDTH / 2., WINDOW_WIDTH / 2. - 32.);
-            transform.translation.y = transform
-                .translation
-                .y
-                .clamp(32. - WINDOW_HEIGHT / 2., WINDOW_HEIGHT / 2. - 32.);
+            transform.translation.x = transform.translation.x.clamp(
+                ANIMAL_SIZE / 2. - WINDOW_WIDTH / 2.,
+                WINDOW_WIDTH / 2. - ANIMAL_SIZE / 2.,
+            );
+            transform.translation.y = transform.translation.y.clamp(
+                ANIMAL_SIZE / 2. - WINDOW_HEIGHT / 2.,
+                WINDOW_HEIGHT / 2. - ANIMAL_SIZE / 2.,
+            );
         }
     }
 }
@@ -158,7 +178,7 @@ fn pick_up_animal(
     }
     if let Some(position) = get_world_coordinates(&windows, &cameras) {
         eprintln!("World coords: {}/{}", position.x, position.y);
-        if let Some(entity) = get_animal_in_reach(&animals, &position, 32.) {
+        if let Some(entity) = get_animal_in_reach(&animals, &position, ANIMAL_SIZE / 2.) {
             commands.entity(entity).insert(Picked);
         }
     }
@@ -166,6 +186,7 @@ fn pick_up_animal(
 
 fn drop_animal(
     mut commands: Commands,
+    time: Res<Time>,
     textures: Res<TextureAssets>,
     mouse_input: Res<Input<MouseButton>>,
     animals: Query<(Entity, &Transform, &Animal), Without<Picked>>,
@@ -178,7 +199,9 @@ fn drop_animal(
     }
     if let Ok((picked_animal_entity, picked_animal)) = picked_animal.get_single() {
         if let Some(position) = get_world_coordinates(&windows, &cameras) {
-            if let Some(dropped_on_animal) = get_animal_in_reach(&animals, &position, 32.) {
+            if let Some(dropped_on_animal) =
+                get_animal_in_reach(&animals, &position, ANIMAL_SIZE / 2.)
+            {
                 if picked_animal.generation == animals.get(dropped_on_animal).unwrap().2.generation
                 {
                     if let Some(next_generation) = picked_animal.generation.next() {
@@ -191,7 +214,9 @@ fn drop_animal(
                             })
                             .insert(Animal {
                                 generation: next_generation,
-                                state: AnimalState::Idle,
+                                state: AnimalState::Idle {
+                                    since: time.seconds_since_startup(),
+                                },
                             });
                         commands.entity(picked_animal_entity).despawn();
                     } else {

@@ -1,6 +1,6 @@
 use crate::animal::{Animal, Picked};
 use crate::loading::TextureAssets;
-use crate::{GameState, WINDOW_HEIGHT, WINDOW_WIDTH};
+use crate::{GameState, ANIMAL_SIZE, WINDOW_HEIGHT, WINDOW_WIDTH};
 use bevy::prelude::*;
 use rand::random;
 
@@ -32,13 +32,13 @@ fn spawn(
         return;
     }
 
-    let animal = Animal::new();
+    let animal = Animal::new(time.seconds_since_startup());
     commands
         .spawn_bundle(SpriteBundle {
             texture: animal.generation.get_texture(&textures),
             transform: Transform::from_xyz(
-                (random::<f32>() - 0.5) * WINDOW_WIDTH,
-                (random::<f32>() - 0.5) * WINDOW_HEIGHT,
+                (random::<f32>() - 0.5) * (WINDOW_WIDTH - ANIMAL_SIZE),
+                (random::<f32>() - 0.5) * (WINDOW_HEIGHT - ANIMAL_SIZE),
                 0.,
             ),
             ..default()
