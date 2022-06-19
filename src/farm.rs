@@ -1,7 +1,8 @@
 use crate::animal::{Animal, Picked};
 use crate::loading::TextureAssets;
-use crate::GameState;
+use crate::{GameState, WINDOW_HEIGHT, WINDOW_WIDTH};
 use bevy::prelude::*;
+use rand::random;
 
 pub struct FarmPlugin;
 
@@ -31,12 +32,18 @@ fn spawn(
         return;
     }
 
+    let animal = Animal::new();
     commands
         .spawn_bundle(SpriteBundle {
-            texture: textures.chicken.clone(),
+            texture: animal.generation.get_texture(&textures),
+            transform: Transform::from_xyz(
+                (random::<f32>() - 0.5) * WINDOW_WIDTH,
+                (random::<f32>() - 0.5) * WINDOW_HEIGHT,
+                0.,
+            ),
             ..default()
         })
-        .insert(Animal::random());
+        .insert(animal);
 }
 
 pub fn get_animal_in_reach(

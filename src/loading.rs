@@ -33,6 +33,8 @@ pub struct AudioAssets {
 pub struct TextureAssets {
     #[asset(key = "chicken")]
     pub chicken: Handle<Image>,
+    #[asset(key = "goat")]
+    pub goat: Handle<Image>,
     #[asset(key = "pig")]
     pub pig: Handle<Image>,
     #[asset(key = "cow")]

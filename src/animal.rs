@@ -1,6 +1,6 @@
 use crate::farm::get_animal_in_reach;
 use crate::loading::TextureAssets;
-use crate::{GameState, MainCamera};
+use crate::{GameState, MainCamera, WINDOW_HEIGHT, WINDOW_WIDTH};
 use bevy::prelude::*;
 use bevy::render::camera::RenderTarget;
 use rand::random;
@@ -14,20 +14,22 @@ impl Plugin for AnimalPlugin {
                 .with_system(move_animals)
                 .with_system(pick_up_animal)
                 .with_system(move_picked_animal)
-                .with_system(drop_animal),
+                .with_system(drop_animal)
+                .with_system(update_animal_state),
         );
     }
 }
 
 #[derive(Component)]
 pub struct Animal {
-    generation: AnimalGeneration,
-    state: AnimalState,
+    pub generation: AnimalGeneration,
+    pub state: AnimalState,
 }
 
 #[derive(PartialEq)]
 pub enum AnimalGeneration {
     Chicken,
+    Goat,
     Cow,
     Pig,
 }
@@ -35,17 +37,28 @@ pub enum AnimalGeneration {
 impl AnimalGeneration {
     fn next(&self) -> Option<Self> {
         match self {
-            AnimalGeneration::Chicken => Some(AnimalGeneration::Cow),
+            AnimalGeneration::Chicken => Some(AnimalGeneration::Goat),
+            AnimalGeneration::Goat => Some(AnimalGeneration::Cow),
             AnimalGeneration::Cow => Some(AnimalGeneration::Pig),
             AnimalGeneration::Pig => None,
         }
     }
 
-    fn get_texture(&self, textures: &TextureAssets) -> Handle<Image> {
+    pub fn get_texture(&self, textures: &TextureAssets) -> Handle<Image> {
         match self {
             AnimalGeneration::Chicken => textures.chicken.clone(),
+            AnimalGeneration::Goat => textures.goat.clone(),
             AnimalGeneration::Cow => textures.cow.clone(),
             AnimalGeneration::Pig => textures.pig.clone(),
+        }
+    }
+
+    fn triangles_per_second(&self) -> f32 {
+        match self {
+            AnimalGeneration::Chicken => 0.5,
+            AnimalGeneration::Goat => 1.5,
+            AnimalGeneration::Cow => 4.,
+            AnimalGeneration::Pig => 9.5,
         }
     }
 }
@@ -53,17 +66,39 @@ impl AnimalGeneration {
 pub enum AnimalState {
     Idle,
     Moving { velocity: Vec2 },
-    Merging,
+}
+
+impl AnimalState {
+    fn update(&mut self) {
+        match self {
+            AnimalState::Idle => {
+                *self = AnimalState::Moving {
+                    velocity: Vec2::new((random::<f32>() * 2.) - 1., (random::<f32>() * 2.) - 1.)
+                        .normalize(),
+                }
+            }
+            AnimalState::Moving { .. } => *self = AnimalState::Idle,
+        }
+    }
 }
 
 impl Animal {
-    pub(crate) fn random() -> Self {
+    pub(crate) fn new() -> Self {
         Animal {
             generation: AnimalGeneration::Chicken,
-            state: AnimalState::Moving {
-                velocity: Vec2::new((random::<f32>() * 2.) - 1., (random::<f32>() * 2.) - 1.)
-                    .normalize(),
-            },
+            state: AnimalState::Idle,
+        }
+    }
+}
+
+fn update_animal_state(mut animals: Query<&mut Animal, Without<Picked>>) {
+    for mut animal in animals.iter_mut() {
+        let chance = match animal.state {
+            AnimalState::Idle => 0.1,
+            AnimalState::Moving { .. } => 0.01,
+        };
+        if random::<f32>() < chance {
+            animal.state.update();
         }
     }
 }
@@ -73,6 +108,15 @@ fn move_animals(mut animals: Query<(&mut Transform, &Animal), Without<Picked>>) 
         if let AnimalState::Moving { velocity } = animal.state {
             transform.translation.x += velocity.x;
             transform.translation.y += velocity.y;
+
+            transform.translation.x = transform
+                .translation
+                .x
+                .clamp(32. - WINDOW_WIDTH / 2., WINDOW_WIDTH / 2. - 32.);
+            transform.translation.y = transform
+                .translation
+                .y
+                .clamp(32. - WINDOW_HEIGHT / 2., WINDOW_HEIGHT / 2. - 32.);
         }
     }
 }
@@ -86,6 +130,15 @@ fn move_picked_animal(
         if let Some(position) = get_world_coordinates(&windows, &cameras) {
             transform.translation.x = position.x;
             transform.translation.y = position.y;
+
+            transform.translation.x = transform
+                .translation
+                .x
+                .clamp(32. - WINDOW_WIDTH / 2., WINDOW_WIDTH / 2. - 32.);
+            transform.translation.y = transform
+                .translation
+                .y
+                .clamp(32. - WINDOW_HEIGHT / 2., WINDOW_HEIGHT / 2. - 32.);
         }
     }
 }

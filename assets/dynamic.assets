@@ -1,6 +1,9 @@
 ({
     "chicken": File (
-        path: "textures/player.png",
+        path: "textures/chicken.png",
+    ),
+    "goat": File (
+        path: "textures/goat.png",
     ),
     "pig": File (
         path: "textures/tree.png",

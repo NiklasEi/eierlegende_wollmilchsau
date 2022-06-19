@@ -3,15 +3,15 @@
 
 use bevy::prelude::{App, ClearColor, Color, Msaa, WindowDescriptor};
 use bevy::DefaultPlugins;
-use bevy_game::GamePlugin;
+use bevy_game::{GamePlugin, WINDOW_HEIGHT, WINDOW_WIDTH};
 
 fn main() {
     App::new()
         .insert_resource(Msaa { samples: 1 })
         .insert_resource(ClearColor(Color::rgb(0.4, 0.4, 0.4)))
         .insert_resource(WindowDescriptor {
-            width: 800.,
-            height: 600.,
+            width: WINDOW_WIDTH,
+            height: WINDOW_HEIGHT,
             title: "Bevy game".to_string(), // ToDo
             ..Default::default()
         })
