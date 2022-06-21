@@ -27,10 +27,14 @@ pub struct FontAssets {
 pub struct AudioAssets {
     #[asset(path = "audio/background.ogg")]
     pub background: Handle<AudioSource>,
+    #[asset(path = "audio/chicken_hatch.ogg")]
+    pub chicken_hatch: Handle<AudioSource>,
 }
 
 #[derive(AssetCollection)]
 pub struct TextureAssets {
+    #[asset(key = "egg")]
+    pub egg: Handle<Image>,
     #[asset(key = "chicken")]
     pub chicken: Handle<Image>,
     #[asset(key = "goat")]

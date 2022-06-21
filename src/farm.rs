@@ -1,7 +1,7 @@
 use crate::animal::{Animal, Picked};
 use crate::loading::TextureAssets;
 use crate::ui::Score;
-use crate::{GameState, ANIMAL_SIZE, WINDOW_HEIGHT, WINDOW_WIDTH};
+use crate::{GameState, ANIMAL_SIZE, UI_WIDTH, WINDOW_HEIGHT, WINDOW_WIDTH};
 use bevy::prelude::*;
 use rand::random;
 
@@ -17,11 +17,11 @@ impl Plugin for FarmPlugin {
     }
 }
 
-struct SpawnTimer(Timer);
+pub struct SpawnTimer(pub Timer);
 
 impl Default for SpawnTimer {
     fn default() -> Self {
-        SpawnTimer(Timer::from_seconds(2., true))
+        SpawnTimer(Timer::from_seconds(2., false))
     }
 }
 
@@ -36,19 +36,21 @@ fn spawn(
         return;
     }
 
-    let animal = Animal::new(time.seconds_since_startup());
     commands
         .spawn_bundle(SpriteBundle {
-            texture: animal.generation.get_texture(&textures),
+            texture: textures.egg.clone(),
             transform: Transform::from_xyz(
-                (random::<f32>() - 0.5) * (WINDOW_WIDTH - ANIMAL_SIZE),
+                (random::<f32>() - 0.5) * (WINDOW_WIDTH - ANIMAL_SIZE - UI_WIDTH) - UI_WIDTH / 2.,
                 (random::<f32>() - 0.5) * (WINDOW_HEIGHT - ANIMAL_SIZE),
                 0.,
             ),
             ..default()
         })
-        .insert(animal);
+        .insert(Egg);
 }
+
+#[derive(Component)]
+pub struct Egg;
 
 pub fn get_animal_in_reach(
     animals: &Query<(Entity, &Transform, &Animal), Without<Picked>>,

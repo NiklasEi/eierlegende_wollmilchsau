@@ -18,6 +18,7 @@ use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 
 pub const WINDOW_WIDTH: f32 = 800.;
+pub const UI_WIDTH: f32 = 200.;
 pub const WINDOW_HEIGHT: f32 = 600.;
 pub const ANIMAL_SIZE: f32 = 64.;
 

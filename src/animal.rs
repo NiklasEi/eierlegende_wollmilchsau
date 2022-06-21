@@ -1,6 +1,7 @@
-use crate::farm::get_animal_in_reach;
+use crate::audio::HatchEvent;
+use crate::farm::{get_animal_in_reach, Egg, SpawnTimer};
 use crate::loading::TextureAssets;
-use crate::{GameState, MainCamera, ANIMAL_SIZE, WINDOW_HEIGHT, WINDOW_WIDTH};
+use crate::{GameState, MainCamera, ANIMAL_SIZE, UI_WIDTH, WINDOW_HEIGHT, WINDOW_WIDTH};
 use bevy::prelude::*;
 use bevy::render::camera::RenderTarget;
 use rand::random;
@@ -86,6 +87,20 @@ impl AnimalState {
         }
     }
 
+    fn change_direction(&mut self, seconds_since_startup: f64) {
+        match self {
+            AnimalState::Moving {
+                ref mut since,
+                ref mut velocity,
+            } => {
+                *since = seconds_since_startup - 1.0;
+                *velocity =
+                    Vec2::new((random::<f32>() * 2.) - 1., (random::<f32>() * 2.) - 1.).normalize();
+            }
+            _ => {}
+        }
+    }
+
     pub fn can_update_movement(&self, seconds_since_startup: f64) -> bool {
         match self {
             AnimalState::Idle { since } => seconds_since_startup - since > 1.,
@@ -114,8 +129,8 @@ fn update_animal_state(mut animals: Query<&mut Animal, Without<Picked>>, time: R
             continue;
         }
         let chance = match animal.state {
-            AnimalState::Idle { .. } => 0.1,
-            AnimalState::Moving { .. } => 0.01,
+            AnimalState::Idle { .. } => 0.02,
+            AnimalState::Moving { .. } => 0.003,
         };
         if random::<f32>() < chance {
             animal.state.update(time.seconds_since_startup());
@@ -123,20 +138,30 @@ fn update_animal_state(mut animals: Query<&mut Animal, Without<Picked>>, time: R
     }
 }
 
-fn move_animals(mut animals: Query<(&mut Transform, &Animal), Without<Picked>>) {
-    for (mut transform, animal) in animals.iter_mut() {
+fn move_animals(
+    mut animals: Query<(&mut Transform, &mut Animal), Without<Picked>>,
+    time: Res<Time>,
+) {
+    for (mut transform, mut animal) in animals.iter_mut() {
         if let AnimalState::Moving { velocity, .. } = animal.state {
             transform.translation.x += velocity.x;
             transform.translation.y += velocity.y;
 
-            transform.translation.x = transform.translation.x.clamp(
-                ANIMAL_SIZE / 2. - WINDOW_WIDTH / 2.,
-                WINDOW_WIDTH / 2. - ANIMAL_SIZE / 2.,
-            );
-            transform.translation.y = transform.translation.y.clamp(
-                ANIMAL_SIZE / 2. - WINDOW_HEIGHT / 2.,
-                WINDOW_HEIGHT / 2. - ANIMAL_SIZE / 2.,
-            );
+            if transform.translation.x < ANIMAL_SIZE / 2. - WINDOW_WIDTH / 2.
+                || transform.translation.x > WINDOW_WIDTH / 2. - ANIMAL_SIZE / 2. - UI_WIDTH
+                || transform.translation.y < ANIMAL_SIZE / 2. - WINDOW_HEIGHT / 2.
+                || transform.translation.y > WINDOW_HEIGHT / 2. - ANIMAL_SIZE / 2.
+            {
+                animal.state.change_direction(time.seconds_since_startup());
+                transform.translation.x = transform.translation.x.clamp(
+                    ANIMAL_SIZE / 2. - WINDOW_WIDTH / 2.,
+                    WINDOW_WIDTH / 2. - ANIMAL_SIZE / 2. - UI_WIDTH,
+                );
+                transform.translation.y = transform.translation.y.clamp(
+                    ANIMAL_SIZE / 2. - WINDOW_HEIGHT / 2.,
+                    WINDOW_HEIGHT / 2. - ANIMAL_SIZE / 2.,
+                );
+            }
         }
     }
 }
@@ -153,7 +178,7 @@ fn move_picked_animal(
 
             transform.translation.x = transform.translation.x.clamp(
                 ANIMAL_SIZE / 2. - WINDOW_WIDTH / 2.,
-                WINDOW_WIDTH / 2. - ANIMAL_SIZE / 2.,
+                WINDOW_WIDTH / 2. - ANIMAL_SIZE / 2. - UI_WIDTH,
             );
             transform.translation.y = transform.translation.y.clamp(
                 ANIMAL_SIZE / 2. - WINDOW_HEIGHT / 2.,
@@ -168,7 +193,12 @@ pub struct Picked;
 
 fn pick_up_animal(
     mut commands: Commands,
+    textures: Res<TextureAssets>,
+    time: Res<Time>,
+    mut hatch_events: EventWriter<HatchEvent>,
+    mut spawn_timer: ResMut<SpawnTimer>,
     animals: Query<(Entity, &Transform, &Animal), Without<Picked>>,
+    eggs: Query<(Entity, &Transform), (Without<Animal>, With<Egg>)>,
     windows: Res<Windows>,
     cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
     mouse_input: Res<Input<MouseButton>>,
@@ -177,7 +207,27 @@ fn pick_up_animal(
         return;
     }
     if let Some(position) = get_world_coordinates(&windows, &cameras) {
-        eprintln!("World coords: {}/{}", position.x, position.y);
+        for (egg, egg_position) in eggs.iter() {
+            if position.distance(Vec2::new(
+                egg_position.translation.x,
+                egg_position.translation.y,
+            )) < 32.
+            {
+                commands.entity(egg).despawn();
+
+                let animal = Animal::new(time.seconds_since_startup());
+                commands
+                    .spawn_bundle(SpriteBundle {
+                        texture: animal.generation.get_texture(&textures),
+                        transform: egg_position.clone(),
+                        ..default()
+                    })
+                    .insert(animal);
+                spawn_timer.0.reset();
+                hatch_events.send(HatchEvent);
+                return;
+            }
+        }
         if let Some(entity) = get_animal_in_reach(&animals, &position, ANIMAL_SIZE / 2.) {
             commands.entity(entity).insert(Picked);
         }
