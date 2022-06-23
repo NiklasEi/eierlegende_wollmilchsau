@@ -33,6 +33,8 @@ pub struct AudioAssets {
 
 #[derive(AssetCollection)]
 pub struct TextureAssets {
+    #[asset(key = "coin")]
+    pub coin: Handle<Image>,
     #[asset(key = "egg")]
     pub egg: Handle<Image>,
     #[asset(key = "chicken")]

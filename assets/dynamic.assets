@@ -1,4 +1,7 @@
 ({
+    "coin": File (
+        path: "textures/coin.png",
+    ),
     "egg": File (
         path: "textures/egg.png",
     ),

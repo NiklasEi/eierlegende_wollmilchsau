@@ -11,11 +11,13 @@ use crate::menu::MenuPlugin;
 
 use crate::animal::AnimalPlugin;
 use crate::farm::FarmPlugin;
-use crate::ui::UiPlugin;
+use crate::ui::{Score, UiPlugin};
 use bevy::app::App;
 #[cfg(debug_assertions)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
+#[cfg(debug_assertions)]
+use bevy_inspector_egui::{InspectorPlugin, WorldInspectorPlugin};
 
 pub const WINDOW_WIDTH: f32 = 800.;
 pub const UI_WIDTH: f32 = 200.;
@@ -45,7 +47,9 @@ impl Plugin for GamePlugin {
         #[cfg(debug_assertions)]
         {
             app.add_plugin(FrameTimeDiagnosticsPlugin::default())
-                .add_plugin(LogDiagnosticsPlugin::default());
+                .add_plugin(LogDiagnosticsPlugin::default())
+                .add_plugin(InspectorPlugin::<Score>::new())
+                .add_plugin(WorldInspectorPlugin::new());
         }
     }
 }
