@@ -1,8 +1,12 @@
+use crate::animal::{Animal, AnimalGeneration};
 use crate::farm::{CurrentEggs, CurrentMaxEggs};
 use crate::loading::{FontAssets, TextureAssets};
 use crate::GameState;
 use bevy::prelude::*;
 use bevy_inspector_egui::Inspectable;
+use strum::IntoEnumIterator;
+
+const UI_WIDTH: f32 = 180.;
 
 pub struct UiPlugin;
 
@@ -14,7 +18,8 @@ impl Plugin for UiPlugin {
                 SystemSet::on_update(GameState::Playing)
                     .with_system(update_score)
                     .with_system(update_current_eggs)
-                    .with_system(update_current_max_eggs),
+                    .with_system(update_current_max_eggs)
+                    .with_system(update_question_marks),
             );
     }
 }
@@ -37,7 +42,7 @@ fn spawn_score(
     commands
         .spawn_bundle(NodeBundle {
             style: Style {
-                size: Size::new(Val::Px(180.0), Val::Percent(100.)),
+                size: Size::new(Val::Px(UI_WIDTH), Val::Percent(100.)),
                 position_type: PositionType::Absolute,
                 justify_content: JustifyContent::FlexStart,
                 align_items: AlignItems::FlexStart,
@@ -186,7 +191,62 @@ fn spawn_score(
                         })
                         .insert(MaxEggText);
                 });
+        })
+        .with_children(|parent| {
+            parent
+                .spawn_bundle(NodeBundle {
+                    style: Style {
+                        flex_direction: FlexDirection::Row,
+                        justify_content: JustifyContent::FlexStart,
+                        align_items: AlignItems::Center,
+                        flex_wrap: FlexWrap::WrapReverse,
+                        position: Rect {
+                            left: Val::Px(5.),
+                            top: Val::Px(5.),
+                            ..default()
+                        },
+                        ..default()
+                    },
+                    color: UiColor(Color::NONE),
+                    ..default()
+                })
+                .with_children(|parent| {
+                    for animal in AnimalGeneration::iter() {
+                        parent
+                            .spawn_bundle(NodeBundle {
+                                style: Style {
+                                    size: Size::new(Val::Px(64.), Val::Px(64.)),
+                                    ..default()
+                                },
+                                image: UiImage(texture_assets.question_mark.clone()),
+                                ..default()
+                            })
+                            .insert(UiAnimal(animal))
+                            .insert(QuestionMark);
+                    }
+                });
         });
+}
+
+#[derive(Component)]
+struct UiAnimal(AnimalGeneration);
+
+#[derive(Component)]
+struct QuestionMark;
+
+fn update_question_marks(
+    mut question_marks: Query<(&mut UiImage, &UiAnimal), (With<QuestionMark>, Without<Animal>)>,
+    new_animal: Query<&Animal, Added<Animal>>,
+    textures: Res<TextureAssets>,
+) {
+    for (mut image, ui_animal) in question_marks.iter_mut() {
+        let new_animal = new_animal
+            .iter()
+            .find(|animal| animal.generation == ui_animal.0);
+        if new_animal.is_some() {
+            image.0 = ui_animal.0.get_texture(&textures);
+        }
+    }
 }
 
 fn update_score(mut score_text: Query<&mut Text, With<ScoreText>>, score: Res<Score>) {

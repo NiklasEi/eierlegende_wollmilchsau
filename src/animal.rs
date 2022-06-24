@@ -5,6 +5,7 @@ use crate::{GameState, MainCamera, ANIMAL_SIZE, UI_WIDTH, WINDOW_HEIGHT, WINDOW_
 use bevy::prelude::*;
 use bevy::render::camera::RenderTarget;
 use rand::random;
+use strum::EnumIter;
 
 pub struct AnimalPlugin;
 
@@ -21,13 +22,13 @@ impl Plugin for AnimalPlugin {
     }
 }
 
-#[derive(Component)]
+#[derive(Component, Debug)]
 pub struct Animal {
     pub generation: AnimalGeneration,
     pub state: AnimalState,
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, EnumIter, Debug)]
 pub enum AnimalGeneration {
     Chicken,
     ChickenDuck,
@@ -82,6 +83,7 @@ impl AnimalGeneration {
     }
 }
 
+#[derive(Debug)]
 pub enum AnimalState {
     Idle { since: f64 },
     Moving { velocity: Vec2, since: f64 },

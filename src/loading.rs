@@ -35,6 +35,8 @@ pub struct AudioAssets {
 pub struct TextureAssets {
     #[asset(key = "background")]
     pub background: Handle<Image>,
+    #[asset(key = "question_mark")]
+    pub question_mark: Handle<Image>,
     #[asset(key = "coin")]
     pub coin: Handle<Image>,
     #[asset(key = "egg")]
