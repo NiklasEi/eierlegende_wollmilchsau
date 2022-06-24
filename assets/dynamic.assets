@@ -2,6 +2,9 @@
     "background": File (
         path: "textures/background.jpg",
     ),
+    "question_mark": File (
+        path: "textures/question_mark.png",
+    ),
     "coin": File (
         path: "textures/coin.png",
     ),
