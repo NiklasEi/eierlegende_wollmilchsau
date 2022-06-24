@@ -3,38 +3,87 @@ use crate::loading::TextureAssets;
 use crate::ui::Score;
 use crate::{GameState, ANIMAL_SIZE, UI_WIDTH, WINDOW_HEIGHT, WINDOW_WIDTH};
 use bevy::prelude::*;
+use bevy_inspector_egui::Inspectable;
 use rand::random;
+
+pub const BACKGROUND_Z: f32 = 0.;
+pub const ANIMAL_Z: f32 = 1.;
 
 pub struct FarmPlugin;
 
 impl Plugin for FarmPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<SpawnTimer>().add_system_set(
-            SystemSet::on_update(GameState::Playing)
-                .with_system(spawn)
-                .with_system(collect_money),
-        );
+        app.init_resource::<SpawnEggTimer>()
+            .init_resource::<CurrentEggs>()
+            .init_resource::<CurrentMaxEggs>()
+            .init_resource::<CurrentEggTime>()
+            .add_system_set(SystemSet::on_enter(GameState::Menu).with_system(draw_background))
+            .add_system_set(
+                SystemSet::on_update(GameState::Playing)
+                    .with_system(spawn)
+                    .with_system(collect_money),
+            );
     }
 }
 
-pub struct SpawnTimer(pub Timer);
+fn draw_background(mut commands: Commands, textures: Res<TextureAssets>) {
+    commands.spawn_bundle(SpriteBundle {
+        transform: Transform::from_xyz(0., 0., BACKGROUND_Z),
+        texture: textures.background.clone(),
+        ..default()
+    });
+}
 
-impl Default for SpawnTimer {
+pub struct CurrentEggs(pub u8);
+
+impl Default for CurrentEggs {
     fn default() -> Self {
-        SpawnTimer(Timer::from_seconds(2., false))
+        CurrentEggs(0)
+    }
+}
+
+#[derive(Inspectable)]
+pub struct CurrentMaxEggs(pub u8);
+
+impl Default for CurrentMaxEggs {
+    fn default() -> Self {
+        CurrentMaxEggs(1)
+    }
+}
+
+pub struct CurrentEggTime(pub f32);
+
+impl Default for CurrentEggTime {
+    fn default() -> Self {
+        CurrentEggTime(2.)
+    }
+}
+
+pub struct SpawnEggTimer(pub Timer);
+
+impl Default for SpawnEggTimer {
+    fn default() -> Self {
+        SpawnEggTimer(Timer::from_seconds(2., false))
     }
 }
 
 fn spawn(
     mut commands: Commands,
     textures: Res<TextureAssets>,
-    mut timer: ResMut<SpawnTimer>,
+    mut timer: ResMut<SpawnEggTimer>,
+    mut current_eggs: ResMut<CurrentEggs>,
+    current_max_eggs: Res<CurrentMaxEggs>,
     time: Res<Time>,
 ) {
+    if current_max_eggs.0 <= current_eggs.0 {
+        return;
+    }
     timer.0.tick(time.delta());
     if !timer.0.just_finished() {
         return;
     }
+    current_eggs.0 += 1;
+    timer.0.reset();
 
     commands
         .spawn_bundle(SpriteBundle {
@@ -42,7 +91,7 @@ fn spawn(
             transform: Transform::from_xyz(
                 (random::<f32>() - 0.5) * (WINDOW_WIDTH - ANIMAL_SIZE - UI_WIDTH) - UI_WIDTH / 2.,
                 (random::<f32>() - 0.5) * (WINDOW_HEIGHT - ANIMAL_SIZE),
-                0.,
+                ANIMAL_Z,
             ),
             ..default()
         })

@@ -1,5 +1,5 @@
 use crate::audio::HatchEvent;
-use crate::farm::{get_animal_in_reach, Egg, SpawnTimer};
+use crate::farm::{get_animal_in_reach, CurrentEggs, Egg};
 use crate::loading::TextureAssets;
 use crate::{GameState, MainCamera, ANIMAL_SIZE, UI_WIDTH, WINDOW_HEIGHT, WINDOW_WIDTH};
 use bevy::prelude::*;
@@ -30,36 +30,54 @@ pub struct Animal {
 #[derive(PartialEq)]
 pub enum AnimalGeneration {
     Chicken,
-    Goat,
-    Cow,
-    Pig,
+    ChickenDuck,
+    ChickenDuckGoat,
+    ChickenDuckGoatSheep,
+    ChickenDuckGoatSheepPig,
+    ChickenDuckGoatSheepPigCow,
+    ChickenDuckGoatSheepPigCowRabbit,
 }
 
 impl AnimalGeneration {
     fn next(&self) -> Option<Self> {
         match self {
-            AnimalGeneration::Chicken => Some(AnimalGeneration::Goat),
-            AnimalGeneration::Goat => Some(AnimalGeneration::Cow),
-            AnimalGeneration::Cow => Some(AnimalGeneration::Pig),
-            AnimalGeneration::Pig => None,
+            AnimalGeneration::Chicken => Some(AnimalGeneration::ChickenDuck),
+            AnimalGeneration::ChickenDuck => Some(AnimalGeneration::ChickenDuckGoat),
+            AnimalGeneration::ChickenDuckGoat => Some(AnimalGeneration::ChickenDuckGoatSheep),
+            AnimalGeneration::ChickenDuckGoatSheep => {
+                Some(AnimalGeneration::ChickenDuckGoatSheepPig)
+            }
+            AnimalGeneration::ChickenDuckGoatSheepPig => {
+                Some(AnimalGeneration::ChickenDuckGoatSheepPigCow)
+            }
+            AnimalGeneration::ChickenDuckGoatSheepPigCow => {
+                Some(AnimalGeneration::ChickenDuckGoatSheepPigCowRabbit)
+            }
+            AnimalGeneration::ChickenDuckGoatSheepPigCowRabbit => None,
         }
     }
 
     pub fn get_texture(&self, textures: &TextureAssets) -> Handle<Image> {
         match self {
             AnimalGeneration::Chicken => textures.chicken.clone(),
-            AnimalGeneration::Goat => textures.goat.clone(),
-            AnimalGeneration::Cow => textures.cow.clone(),
-            AnimalGeneration::Pig => textures.pig.clone(),
+            AnimalGeneration::ChickenDuck => textures.chicken_2.clone(),
+            AnimalGeneration::ChickenDuckGoat => textures.chicken_3.clone(),
+            AnimalGeneration::ChickenDuckGoatSheep => textures.chicken_4.clone(),
+            AnimalGeneration::ChickenDuckGoatSheepPig => textures.chicken_5.clone(),
+            AnimalGeneration::ChickenDuckGoatSheepPigCow => textures.chicken_6.clone(),
+            AnimalGeneration::ChickenDuckGoatSheepPigCowRabbit => textures.chicken_7.clone(),
         }
     }
 
     pub fn money_per_second(&self) -> f32 {
         match self {
             AnimalGeneration::Chicken => 0.5,
-            AnimalGeneration::Goat => 1.5,
-            AnimalGeneration::Cow => 4.,
-            AnimalGeneration::Pig => 9.5,
+            AnimalGeneration::ChickenDuck => 1.5,
+            AnimalGeneration::ChickenDuckGoat => 4.,
+            AnimalGeneration::ChickenDuckGoatSheep => 9.5,
+            AnimalGeneration::ChickenDuckGoatSheepPig => 21.,
+            AnimalGeneration::ChickenDuckGoatSheepPigCow => 44.5,
+            AnimalGeneration::ChickenDuckGoatSheepPigCowRabbit => 92.,
         }
     }
 }
@@ -196,7 +214,7 @@ fn pick_up_animal(
     textures: Res<TextureAssets>,
     time: Res<Time>,
     mut hatch_events: EventWriter<HatchEvent>,
-    mut spawn_timer: ResMut<SpawnTimer>,
+    mut current_eggs: ResMut<CurrentEggs>,
     animals: Query<(Entity, &Transform, &Animal), Without<Picked>>,
     eggs: Query<(Entity, &Transform), (Without<Animal>, With<Egg>)>,
     windows: Res<Windows>,
@@ -223,7 +241,7 @@ fn pick_up_animal(
                         ..default()
                     })
                     .insert(animal);
-                spawn_timer.0.reset();
+                current_eggs.0 -= 1;
                 hatch_events.send(HatchEvent);
                 return;
             }

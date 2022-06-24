@@ -1,3 +1,4 @@
+use crate::farm::{CurrentEggs, CurrentMaxEggs};
 use crate::loading::{FontAssets, TextureAssets};
 use crate::GameState;
 use bevy::prelude::*;
@@ -9,7 +10,12 @@ impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<Score>()
             .add_system_set(SystemSet::on_enter(GameState::Playing).with_system(spawn_score))
-            .add_system_set(SystemSet::on_update(GameState::Playing).with_system(update_score));
+            .add_system_set(
+                SystemSet::on_update(GameState::Playing)
+                    .with_system(update_score)
+                    .with_system(update_current_eggs)
+                    .with_system(update_current_max_eggs),
+            );
     }
 }
 
@@ -31,7 +37,7 @@ fn spawn_score(
     commands
         .spawn_bundle(NodeBundle {
             style: Style {
-                size: Size::new(Val::Px(200.0), Val::Percent(100.)),
+                size: Size::new(Val::Px(180.0), Val::Percent(100.)),
                 position_type: PositionType::Absolute,
                 justify_content: JustifyContent::FlexStart,
                 align_items: AlignItems::FlexStart,
@@ -43,12 +49,7 @@ fn spawn_score(
                 },
                 ..Default::default()
             },
-            color: UiColor(Color::Rgba {
-                red: 0.7,
-                green: 0.7,
-                blue: 0.7,
-                alpha: 0.7,
-            }),
+            color: UiColor(Color::NONE),
             ..Default::default()
         })
         // Money
@@ -189,5 +190,25 @@ fn spawn_score(
 }
 
 fn update_score(mut score_text: Query<&mut Text, With<ScoreText>>, score: Res<Score>) {
-    score_text.single_mut().sections[0].value = format!("{:.0}", score.0.floor());
+    if score.is_changed() {
+        score_text.single_mut().sections[0].value = format!("{:.0}", score.0.floor());
+    }
+}
+
+fn update_current_eggs(
+    mut egg_text: Query<&mut Text, With<CurrentEggText>>,
+    current_eggs: Res<CurrentEggs>,
+) {
+    if current_eggs.is_changed() {
+        egg_text.single_mut().sections[0].value = format!("{}", current_eggs.0);
+    }
+}
+
+fn update_current_max_eggs(
+    mut egg_text: Query<&mut Text, With<MaxEggText>>,
+    current_max_eggs: Res<CurrentMaxEggs>,
+) {
+    if current_max_eggs.is_changed() {
+        egg_text.single_mut().sections[0].value = format!("{}", current_max_eggs.0);
+    }
 }

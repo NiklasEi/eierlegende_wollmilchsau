@@ -1,4 +1,7 @@
 ({
+    "background": File (
+        path: "textures/background.jpg",
+    ),
     "coin": File (
         path: "textures/coin.png",
     ),
@@ -8,13 +11,22 @@
     "chicken": File (
         path: "textures/chicken.png",
     ),
-    "goat": File (
-        path: "textures/goat.png",
+    "chicken_2": File (
+        path: "textures/chicken_2.png",
     ),
-    "pig": File (
-        path: "textures/tree.png",
+    "chicken_3": File (
+        path: "textures/chicken_3.png",
     ),
-    "cow": File (
-        path: "textures/zombie.png",
+    "chicken_4": File (
+        path: "textures/chicken_4.png",
+    ),
+    "chicken_5": File (
+        path: "textures/chicken_5.png",
+    ),
+    "chicken_6": File (
+        path: "textures/chicken_6.png",
+    ),
+    "chicken_7": File (
+        path: "textures/chicken_7.png",
     ),
 })

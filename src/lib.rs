@@ -10,7 +10,7 @@ use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
 
 use crate::animal::AnimalPlugin;
-use crate::farm::FarmPlugin;
+use crate::farm::{CurrentMaxEggs, FarmPlugin};
 use crate::ui::{Score, UiPlugin};
 use bevy::app::App;
 #[cfg(debug_assertions)]
@@ -49,6 +49,7 @@ impl Plugin for GamePlugin {
             app.add_plugin(FrameTimeDiagnosticsPlugin::default())
                 .add_plugin(LogDiagnosticsPlugin::default())
                 .add_plugin(InspectorPlugin::<Score>::new())
+                .add_plugin(InspectorPlugin::<CurrentMaxEggs>::new())
                 .add_plugin(WorldInspectorPlugin::new());
         }
     }

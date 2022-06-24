@@ -33,16 +33,24 @@ pub struct AudioAssets {
 
 #[derive(AssetCollection)]
 pub struct TextureAssets {
+    #[asset(key = "background")]
+    pub background: Handle<Image>,
     #[asset(key = "coin")]
     pub coin: Handle<Image>,
     #[asset(key = "egg")]
     pub egg: Handle<Image>,
     #[asset(key = "chicken")]
     pub chicken: Handle<Image>,
-    #[asset(key = "goat")]
-    pub goat: Handle<Image>,
-    #[asset(key = "pig")]
-    pub pig: Handle<Image>,
-    #[asset(key = "cow")]
-    pub cow: Handle<Image>,
+    #[asset(key = "chicken_2")]
+    pub chicken_2: Handle<Image>,
+    #[asset(key = "chicken_3")]
+    pub chicken_3: Handle<Image>,
+    #[asset(key = "chicken_4")]
+    pub chicken_4: Handle<Image>,
+    #[asset(key = "chicken_5")]
+    pub chicken_5: Handle<Image>,
+    #[asset(key = "chicken_6")]
+    pub chicken_6: Handle<Image>,
+    #[asset(key = "chicken_7")]
+    pub chicken_7: Handle<Image>,
 }
