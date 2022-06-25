@@ -11,6 +11,9 @@
     "egg": File (
         path: "textures/egg.png",
     ),
+    "egg_timer": File (
+        path: "textures/egg_timer.png",
+    ),
     "chicken": File (
         path: "textures/chicken.png",
     ),
