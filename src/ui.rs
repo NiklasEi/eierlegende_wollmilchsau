@@ -1,5 +1,5 @@
 use crate::animal::{Animal, AnimalGeneration};
-use crate::farm::{CurrentEggs, CurrentMaxEggs};
+use crate::farm::{CurrentEggTime, CurrentEggs, CurrentMaxEggs};
 use crate::loading::{FontAssets, TextureAssets};
 use crate::menu::ButtonColors;
 use crate::GameState;
@@ -15,6 +15,7 @@ impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<Score>()
             .insert_resource(MaxEggPrice(1000.))
+            .insert_resource(EggTimePrice(10.))
             .add_system_set(SystemSet::on_enter(GameState::Playing).with_system(spawn_score))
             .add_system_set(
                 SystemSet::on_update(GameState::Playing)
@@ -22,7 +23,9 @@ impl Plugin for UiPlugin {
                     .with_system(update_current_eggs)
                     .with_system(update_current_max_eggs)
                     .with_system(update_question_marks)
-                    .with_system(buy_max_egg),
+                    .with_system(buy_max_egg)
+                    .with_system(buy_faster_eggs)
+                    .with_system(update_egg_time),
             );
     }
 }
@@ -35,7 +38,13 @@ struct ScoreText;
 #[derive(Component)]
 struct CurrentEggText;
 #[derive(Component)]
+struct CurrentEggTimerText;
+#[derive(Component)]
 struct MaxEggText;
+#[derive(Component)]
+struct DecreaseEggTimeButton;
+#[derive(Component)]
+struct IncreaseMaxEggsButton;
 
 fn spawn_score(
     mut commands: Commands,
@@ -114,6 +123,93 @@ fn spawn_score(
                         .insert(ScoreText);
                 });
         })
+        // Egg timer
+        .with_children(|parent| {
+            parent
+                .spawn_bundle(NodeBundle {
+                    style: Style {
+                        flex_direction: FlexDirection::Row,
+                        justify_content: JustifyContent::FlexStart,
+                        align_items: AlignItems::Center,
+                        position: Rect {
+                            left: Val::Px(5.),
+                            top: Val::Px(5.),
+                            ..default()
+                        },
+                        ..default()
+                    },
+                    color: UiColor(Color::NONE),
+                    ..default()
+                })
+                .with_children(|parent| {
+                    parent.spawn_bundle(NodeBundle {
+                        style: Style {
+                            size: Size::new(Val::Px(32.), Val::Px(32.)),
+                            ..default()
+                        },
+                        image: UiImage(texture_assets.egg_timer.clone()),
+                        ..default()
+                    });
+                    parent.spawn_bundle(NodeBundle {
+                        style: Style {
+                            size: Size::new(Val::Px(8.), Val::Px(16.)),
+                            ..default()
+                        },
+                        color: UiColor(Color::NONE),
+                        ..default()
+                    });
+                    parent
+                        .spawn_bundle(TextBundle {
+                            text: Text {
+                                sections: vec![TextSection {
+                                    value: "10".to_string(),
+                                    style: TextStyle {
+                                        font: font_assets.fira_sans.clone(),
+                                        font_size: 40.0,
+                                        color: Color::rgb_u8(34, 32, 52),
+                                    },
+                                }],
+                                alignment: Default::default(),
+                            },
+                            ..Default::default()
+                        })
+                        .insert(CurrentEggTimerText);
+                    parent
+                        .spawn_bundle(ButtonBundle {
+                            style: Style {
+                                size: Size::new(Val::Px(32.0), Val::Px(32.0)),
+                                margin: Rect::all(Val::Auto),
+                                justify_content: JustifyContent::Center,
+                                align_items: AlignItems::Center,
+                                position: Rect {
+                                    left: Val::Px(10.),
+                                    ..default()
+                                },
+                                ..Default::default()
+                            },
+                            color: button_colors.normal,
+                            ..Default::default()
+                        })
+                        .insert(DecreaseEggTimeButton)
+                        .with_children(|parent| {
+                            parent.spawn_bundle(TextBundle {
+                                text: Text {
+                                    sections: vec![TextSection {
+                                        value: "-".to_string(),
+                                        style: TextStyle {
+                                            font: font_assets.fira_sans.clone(),
+                                            font_size: 40.0,
+                                            color: Color::rgb(0.9, 0.9, 0.9),
+                                        },
+                                    }],
+                                    alignment: Default::default(),
+                                },
+                                ..Default::default()
+                            });
+                        });
+                });
+        })
+        // Current max eggs
         .with_children(|parent| {
             parent
                 .spawn_bundle(NodeBundle {
@@ -210,6 +306,7 @@ fn spawn_score(
                             color: button_colors.normal,
                             ..Default::default()
                         })
+                        .insert(IncreaseMaxEggsButton)
                         .with_children(|parent| {
                             parent.spawn_bundle(TextBundle {
                                 text: Text {
@@ -228,6 +325,7 @@ fn spawn_score(
                         });
                 });
         })
+        // Explain text
         .with_children(|parent| {
             parent
                 .spawn_bundle(NodeBundle {
@@ -257,6 +355,7 @@ fn spawn_score(
                         .insert(ExplainText);
                 });
         })
+        // Animal collection
         .with_children(|parent| {
             parent
                 .spawn_bundle(NodeBundle {
@@ -351,7 +450,11 @@ fn buy_max_egg(
     mut score: ResMut<Score>,
     mut interaction_query: Query<
         (&Interaction, &mut UiColor),
-        (Changed<Interaction>, With<Button>, Without<ExplainText>),
+        (
+            Changed<Interaction>,
+            With<IncreaseMaxEggsButton>,
+            Without<ExplainText>,
+        ),
     >,
     mut explain_text: Query<&mut Text, With<ExplainText>>,
 ) {
@@ -376,5 +479,60 @@ fn buy_max_egg(
                 text.sections.get_mut(0).unwrap().value = "".to_owned();
             }
         }
+    }
+}
+
+pub struct EggTimePrice(pub f32);
+
+fn buy_faster_eggs(
+    button_colors: Res<ButtonColors>,
+    mut current_egg_time: ResMut<CurrentEggTime>,
+    mut egg_time_price: ResMut<EggTimePrice>,
+    mut score: ResMut<Score>,
+    mut interaction_query: Query<
+        (&Interaction, &mut UiColor),
+        (
+            Changed<Interaction>,
+            With<DecreaseEggTimeButton>,
+            Without<ExplainText>,
+        ),
+    >,
+    mut explain_text: Query<&mut Text, With<ExplainText>>,
+) {
+    for (interaction, mut color) in interaction_query.iter_mut() {
+        match *interaction {
+            Interaction::Clicked => {
+                if score.0 > egg_time_price.0 && current_egg_time.0 > 1.5 {
+                    score.0 -= egg_time_price.0;
+                    current_egg_time.0 -= 1.;
+                    egg_time_price.0 *= 10.;
+                }
+            }
+            Interaction::Hovered => {
+                *color = button_colors.hovered;
+                let mut text = explain_text.single_mut();
+                text.sections.get_mut(0).unwrap().value =
+                    format!("-1s for egg: {} G", egg_time_price.0);
+            }
+            Interaction::None => {
+                *color = button_colors.normal;
+                let mut text = explain_text.single_mut();
+                text.sections.get_mut(0).unwrap().value = "".to_owned();
+            }
+        }
+    }
+}
+
+fn update_egg_time(
+    current_egg_time: Res<CurrentEggTime>,
+    mut egg_time_text: Query<&mut Text, With<CurrentEggTimerText>>,
+) {
+    if current_egg_time.is_changed() {
+        egg_time_text
+            .single_mut()
+            .sections
+            .get_mut(0)
+            .unwrap()
+            .value = format!("{:.0}", current_egg_time.0.floor());
     }
 }

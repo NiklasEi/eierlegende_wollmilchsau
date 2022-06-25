@@ -5,6 +5,7 @@ use crate::{GameState, ANIMAL_SIZE, UI_WIDTH, WINDOW_HEIGHT, WINDOW_WIDTH};
 use bevy::prelude::*;
 use bevy_inspector_egui::Inspectable;
 use rand::random;
+use std::time::Duration;
 
 pub const BACKGROUND_Z: f32 = 0.;
 pub const ANIMAL_Z: f32 = 1.;
@@ -21,7 +22,8 @@ impl Plugin for FarmPlugin {
             .add_system_set(
                 SystemSet::on_update(GameState::Playing)
                     .with_system(spawn)
-                    .with_system(collect_money),
+                    .with_system(collect_money)
+                    .with_system(update_spawner_timer),
             );
     }
 }
@@ -55,7 +57,7 @@ pub struct CurrentEggTime(pub f32);
 
 impl Default for CurrentEggTime {
     fn default() -> Self {
-        CurrentEggTime(2.)
+        CurrentEggTime(10.)
     }
 }
 
@@ -63,7 +65,18 @@ pub struct SpawnEggTimer(pub Timer);
 
 impl Default for SpawnEggTimer {
     fn default() -> Self {
-        SpawnEggTimer(Timer::from_seconds(2., false))
+        let mut timer = SpawnEggTimer(Timer::from_seconds(10., false));
+        timer.0.set_elapsed(Duration::from_secs(9));
+
+        timer
+    }
+}
+
+fn update_spawner_timer(current_egg_time: Res<CurrentEggTime>, mut timer: ResMut<SpawnEggTimer>) {
+    if current_egg_time.is_changed() {
+        timer
+            .0
+            .set_duration(Duration::from_secs_f32(current_egg_time.0));
     }
 }
 

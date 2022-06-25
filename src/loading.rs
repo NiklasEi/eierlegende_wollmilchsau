@@ -41,6 +41,8 @@ pub struct TextureAssets {
     pub coin: Handle<Image>,
     #[asset(key = "egg")]
     pub egg: Handle<Image>,
+    #[asset(key = "egg_timer")]
+    pub egg_timer: Handle<Image>,
     #[asset(key = "chicken")]
     pub chicken: Handle<Image>,
     #[asset(key = "chicken_2")]
