@@ -1,6 +1,7 @@
 use crate::animal::{Animal, AnimalGeneration};
 use crate::farm::{CurrentEggs, CurrentMaxEggs};
 use crate::loading::{FontAssets, TextureAssets};
+use crate::menu::ButtonColors;
 use crate::GameState;
 use bevy::prelude::*;
 use bevy_inspector_egui::Inspectable;
@@ -13,13 +14,15 @@ pub struct UiPlugin;
 impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<Score>()
+            .insert_resource(MaxEggPrice(1000.))
             .add_system_set(SystemSet::on_enter(GameState::Playing).with_system(spawn_score))
             .add_system_set(
                 SystemSet::on_update(GameState::Playing)
                     .with_system(update_score)
                     .with_system(update_current_eggs)
                     .with_system(update_current_max_eggs)
-                    .with_system(update_question_marks),
+                    .with_system(update_question_marks)
+                    .with_system(buy_max_egg),
             );
     }
 }
@@ -37,6 +40,7 @@ struct MaxEggText;
 fn spawn_score(
     mut commands: Commands,
     font_assets: Res<FontAssets>,
+    button_colors: Res<ButtonColors>,
     texture_assets: Res<TextureAssets>,
 ) {
     commands
@@ -190,6 +194,67 @@ fn spawn_score(
                             ..Default::default()
                         })
                         .insert(MaxEggText);
+                    parent
+                        .spawn_bundle(ButtonBundle {
+                            style: Style {
+                                size: Size::new(Val::Px(32.0), Val::Px(32.0)),
+                                margin: Rect::all(Val::Auto),
+                                justify_content: JustifyContent::Center,
+                                align_items: AlignItems::Center,
+                                position: Rect {
+                                    left: Val::Px(10.),
+                                    ..default()
+                                },
+                                ..Default::default()
+                            },
+                            color: button_colors.normal,
+                            ..Default::default()
+                        })
+                        .with_children(|parent| {
+                            parent.spawn_bundle(TextBundle {
+                                text: Text {
+                                    sections: vec![TextSection {
+                                        value: "+".to_string(),
+                                        style: TextStyle {
+                                            font: font_assets.fira_sans.clone(),
+                                            font_size: 40.0,
+                                            color: Color::rgb(0.9, 0.9, 0.9),
+                                        },
+                                    }],
+                                    alignment: Default::default(),
+                                },
+                                ..Default::default()
+                            });
+                        });
+                });
+        })
+        .with_children(|parent| {
+            parent
+                .spawn_bundle(NodeBundle {
+                    style: Style {
+                        size: Size::new(Val::Percent(100.), Val::Px(32.)),
+                        ..default()
+                    },
+                    color: UiColor(Color::NONE),
+                    ..default()
+                })
+                .with_children(|parent| {
+                    parent
+                        .spawn_bundle(TextBundle {
+                            text: Text {
+                                sections: vec![TextSection {
+                                    value: "".to_string(),
+                                    style: TextStyle {
+                                        font: font_assets.fira_sans.clone(),
+                                        font_size: 15.0,
+                                        color: Color::rgb(0.9, 0.9, 0.9),
+                                    },
+                                }],
+                                alignment: Default::default(),
+                            },
+                            ..Default::default()
+                        })
+                        .insert(ExplainText);
                 });
         })
         .with_children(|parent| {
@@ -200,9 +265,10 @@ fn spawn_score(
                         justify_content: JustifyContent::FlexStart,
                         align_items: AlignItems::Center,
                         flex_wrap: FlexWrap::WrapReverse,
+
                         position: Rect {
                             left: Val::Px(5.),
-                            top: Val::Px(5.),
+                            top: Val::Px(15.),
                             ..default()
                         },
                         ..default()
@@ -227,6 +293,9 @@ fn spawn_score(
                 });
         });
 }
+
+#[derive(Component)]
+struct ExplainText;
 
 #[derive(Component)]
 struct UiAnimal(AnimalGeneration);
@@ -270,5 +339,42 @@ fn update_current_max_eggs(
 ) {
     if current_max_eggs.is_changed() {
         egg_text.single_mut().sections[0].value = format!("{}", current_max_eggs.0);
+    }
+}
+
+pub struct MaxEggPrice(pub f32);
+
+fn buy_max_egg(
+    button_colors: Res<ButtonColors>,
+    mut current_max_eggs: ResMut<CurrentMaxEggs>,
+    mut max_egg_price: ResMut<MaxEggPrice>,
+    mut score: ResMut<Score>,
+    mut interaction_query: Query<
+        (&Interaction, &mut UiColor),
+        (Changed<Interaction>, With<Button>, Without<ExplainText>),
+    >,
+    mut explain_text: Query<&mut Text, With<ExplainText>>,
+) {
+    for (interaction, mut color) in interaction_query.iter_mut() {
+        match *interaction {
+            Interaction::Clicked => {
+                if score.0 > max_egg_price.0 {
+                    score.0 -= max_egg_price.0;
+                    current_max_eggs.0 += 1;
+                    max_egg_price.0 *= 10.;
+                }
+            }
+            Interaction::Hovered => {
+                *color = button_colors.hovered;
+                let mut text = explain_text.single_mut();
+                text.sections.get_mut(0).unwrap().value =
+                    format!("+1 max eggs for {} G", max_egg_price.0);
+            }
+            Interaction::None => {
+                *color = button_colors.normal;
+                let mut text = explain_text.single_mut();
+                text.sections.get_mut(0).unwrap().value = "".to_owned();
+            }
+        }
     }
 }

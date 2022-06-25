@@ -27,10 +27,10 @@ fn process_actions(
     cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
     mouse_input: Res<Input<MouseButton>>,
 ) {
-    if let Some(touch) = touches_input.get_pressed(0) {
+    if let Some(touch) = touches_input.iter().next() {
         actions.position = Some(touch.position());
-        actions.just_pressed = touches_input.just_pressed(0);
-        actions.just_released = touches_input.just_released(0);
+        actions.just_pressed = touches_input.any_just_pressed();
+        actions.just_released = touches_input.any_just_released();
         println!("{:?}", touch);
     } else if mouse_input.pressed(MouseButton::Left) || mouse_input.just_released(MouseButton::Left)
     {
