@@ -14,8 +14,8 @@ impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<ButtonColors>()
             .init_resource::<Score>()
-            .insert_resource(MaxEggPrice(1000.))
-            .insert_resource(EggTimePrice(10.))
+            .insert_resource(MaxEggPrice(100.))
+            .insert_resource(EggTimePrice(20.))
             .add_system_set(SystemSet::on_enter(GameState::Playing).with_system(spawn_ui))
             .add_system_set(
                 SystemSet::on_update(GameState::Playing)
@@ -162,14 +162,24 @@ fn spawn_ui(
                     parent
                         .spawn_bundle(TextBundle {
                             text: Text {
-                                sections: vec![TextSection {
-                                    value: "10".to_string(),
-                                    style: TextStyle {
-                                        font: font_assets.fira_sans.clone(),
-                                        font_size: 40.0,
-                                        color: Color::rgb_u8(34, 32, 52),
+                                sections: vec![
+                                    TextSection {
+                                        value: "10".to_string(),
+                                        style: TextStyle {
+                                            font: font_assets.fira_sans.clone(),
+                                            font_size: 40.0,
+                                            color: Color::rgb_u8(34, 32, 52),
+                                        },
                                     },
-                                }],
+                                    TextSection {
+                                        value: "s".to_string(),
+                                        style: TextStyle {
+                                            font: font_assets.fira_sans.clone(),
+                                            font_size: 40.0,
+                                            color: Color::rgb_u8(34, 32, 52),
+                                        },
+                                    },
+                                ],
                                 alignment: Default::default(),
                             },
                             ..Default::default()
@@ -506,7 +516,7 @@ fn buy_faster_eggs(
                 if score.0 > egg_time_price.0 && current_egg_time.0 > 1.5 {
                     score.0 -= egg_time_price.0;
                     current_egg_time.0 -= 1.;
-                    egg_time_price.0 *= 10.;
+                    egg_time_price.0 *= 5.;
                 }
             }
             Interaction::Hovered => {

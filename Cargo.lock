@@ -445,20 +445,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bevy_game"
-version = "0.1.0"
-dependencies = [
- "bevy",
- "bevy-inspector-egui",
- "bevy_asset_loader",
- "bevy_kira_audio",
- "embed-resource",
- "rand",
- "strum",
- "winit 0.25.0",
-]
-
-[[package]]
 name = "bevy_gltf"
 version = "0.7.0"
 source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
@@ -2973,6 +2959,20 @@ name = "shlex"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "43b2853a4d09f215c24cc5489c992ce46052d359b5109343cbafbf26bc62f8a3"
+
+[[package]]
+name = "shmoo_farm"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy-inspector-egui",
+ "bevy_asset_loader",
+ "bevy_kira_audio",
+ "embed-resource",
+ "rand",
+ "strum",
+ "winit 0.25.0",
+]
 
 [[package]]
 name = "slab"

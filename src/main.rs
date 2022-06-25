@@ -3,7 +3,7 @@
 
 use bevy::prelude::{App, ClearColor, Color, Msaa, WindowDescriptor};
 use bevy::DefaultPlugins;
-use bevy_game::{GamePlugin, WINDOW_HEIGHT, WINDOW_WIDTH};
+use shmoo_farm::{GamePlugin, WINDOW_HEIGHT, WINDOW_WIDTH};
 
 fn main() {
     App::new()
@@ -12,7 +12,7 @@ fn main() {
         .insert_resource(WindowDescriptor {
             width: WINDOW_WIDTH,
             height: WINDOW_HEIGHT,
-            title: "Bevy game".to_string(), // ToDo
+            title: "Shmoo Farm".to_string(),
             ..Default::default()
         })
         .add_plugins(DefaultPlugins)
