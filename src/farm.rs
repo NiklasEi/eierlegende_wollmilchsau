@@ -18,7 +18,7 @@ impl Plugin for FarmPlugin {
             .init_resource::<CurrentEggs>()
             .init_resource::<CurrentMaxEggs>()
             .init_resource::<CurrentEggTime>()
-            .add_system_set(SystemSet::on_enter(GameState::Menu).with_system(draw_background))
+            .add_system_set(SystemSet::on_enter(GameState::Playing).with_system(draw_background))
             .add_system_set(
                 SystemSet::on_update(GameState::Playing)
                     .with_system(spawn)
@@ -53,6 +53,7 @@ impl Default for CurrentMaxEggs {
     }
 }
 
+#[derive(Inspectable)]
 pub struct CurrentEggTime(pub f32);
 
 impl Default for CurrentEggTime {

@@ -1,9 +1,10 @@
 use crate::actions::Actions;
-use crate::audio::HatchEvent;
+use crate::audio::AnimalEvent;
 use crate::farm::{get_animal_in_reach, CurrentEggs, Egg};
-use crate::loading::TextureAssets;
+use crate::loading::{AudioAssets, TextureAssets};
 use crate::{GameState, ShmooLabels, ANIMAL_SIZE, UI_WIDTH, WINDOW_HEIGHT, WINDOW_WIDTH};
 use bevy::prelude::*;
+use bevy_kira_audio::AudioSource;
 use rand::random;
 use strum::EnumIter;
 
@@ -32,7 +33,7 @@ pub struct Animal {
     pub state: AnimalState,
 }
 
-#[derive(PartialEq, EnumIter, Debug)]
+#[derive(PartialEq, EnumIter, Debug, Clone)]
 pub enum AnimalGeneration {
     Chicken,
     ChickenDuck,
@@ -71,6 +72,18 @@ impl AnimalGeneration {
             AnimalGeneration::ChickenDuckGoatSheepPig => textures.chicken_5.clone(),
             AnimalGeneration::ChickenDuckGoatSheepPigCow => textures.chicken_6.clone(),
             AnimalGeneration::ChickenDuckGoatSheepPigCowRabbit => textures.chicken_7.clone(),
+        }
+    }
+
+    pub fn get_audio(&self, audio: &AudioAssets) -> Handle<AudioSource> {
+        match self {
+            AnimalGeneration::Chicken => audio.chicken.clone(),
+            AnimalGeneration::ChickenDuck => audio.duck.clone(),
+            AnimalGeneration::ChickenDuckGoat => audio.goat.clone(),
+            AnimalGeneration::ChickenDuckGoatSheep => audio.sheep.clone(),
+            AnimalGeneration::ChickenDuckGoatSheepPig => audio.pig.clone(),
+            AnimalGeneration::ChickenDuckGoatSheepPigCow => audio.cow.clone(),
+            AnimalGeneration::ChickenDuckGoatSheepPigCowRabbit => audio.yipee.clone(),
         }
     }
 
@@ -215,7 +228,7 @@ fn pick_up_animal(
     mut commands: Commands,
     textures: Res<TextureAssets>,
     time: Res<Time>,
-    mut hatch_events: EventWriter<HatchEvent>,
+    mut hatch_events: EventWriter<AnimalEvent>,
     mut current_eggs: ResMut<CurrentEggs>,
     animals: Query<(Entity, &Transform, &Animal), Without<Picked>>,
     eggs: Query<(Entity, &Transform), (Without<Animal>, With<Egg>)>,
@@ -234,6 +247,7 @@ fn pick_up_animal(
                 commands.entity(egg).despawn();
 
                 let animal = Animal::new(time.seconds_since_startup());
+                hatch_events.send(AnimalEvent(animal.generation.clone()));
                 commands
                     .spawn_bundle(SpriteBundle {
                         texture: animal.generation.get_texture(&textures),
@@ -242,7 +256,6 @@ fn pick_up_animal(
                     })
                     .insert(animal);
                 current_eggs.0 -= 1;
-                hatch_events.send(HatchEvent);
                 return;
             }
         }
@@ -256,6 +269,7 @@ fn drop_animal(
     mut commands: Commands,
     time: Res<Time>,
     textures: Res<TextureAssets>,
+    mut animal_events: EventWriter<AnimalEvent>,
     animals: Query<(Entity, &Transform, &Animal), Without<Picked>>,
     picked_animal: Query<(Entity, &Animal), With<Picked>>,
     actions: Res<Actions>,
@@ -271,6 +285,7 @@ fn drop_animal(
                 if picked_animal.generation == animals.get(dropped_on_animal).unwrap().2.generation
                 {
                     if let Some(next_generation) = picked_animal.generation.next() {
+                        animal_events.send(AnimalEvent(next_generation.clone()));
                         commands.entity(dropped_on_animal).despawn();
                         commands
                             .spawn_bundle(SpriteBundle {

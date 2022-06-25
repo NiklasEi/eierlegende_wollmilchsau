@@ -1,7 +1,6 @@
 use crate::animal::{Animal, AnimalGeneration};
 use crate::farm::{CurrentEggTime, CurrentEggs, CurrentMaxEggs};
 use crate::loading::{FontAssets, TextureAssets};
-use crate::menu::ButtonColors;
 use crate::GameState;
 use bevy::prelude::*;
 use bevy_inspector_egui::Inspectable;
@@ -13,10 +12,11 @@ pub struct UiPlugin;
 
 impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<Score>()
+        app.init_resource::<ButtonColors>()
+            .init_resource::<Score>()
             .insert_resource(MaxEggPrice(1000.))
             .insert_resource(EggTimePrice(10.))
-            .add_system_set(SystemSet::on_enter(GameState::Playing).with_system(spawn_score))
+            .add_system_set(SystemSet::on_enter(GameState::Playing).with_system(spawn_ui))
             .add_system_set(
                 SystemSet::on_update(GameState::Playing)
                     .with_system(update_score)
@@ -46,12 +46,13 @@ struct DecreaseEggTimeButton;
 #[derive(Component)]
 struct IncreaseMaxEggsButton;
 
-fn spawn_score(
+fn spawn_ui(
     mut commands: Commands,
     font_assets: Res<FontAssets>,
     button_colors: Res<ButtonColors>,
     texture_assets: Res<TextureAssets>,
 ) {
+    commands.spawn_bundle(UiCameraBundle::default());
     commands
         .spawn_bundle(NodeBundle {
             style: Style {
@@ -534,5 +535,19 @@ fn update_egg_time(
             .get_mut(0)
             .unwrap()
             .value = format!("{:.0}", current_egg_time.0.floor());
+    }
+}
+
+pub struct ButtonColors {
+    pub normal: UiColor,
+    pub hovered: UiColor,
+}
+
+impl Default for ButtonColors {
+    fn default() -> Self {
+        ButtonColors {
+            normal: Color::rgb(0.15, 0.15, 0.15).into(),
+            hovered: Color::rgb(0.25, 0.25, 0.25).into(),
+        }
     }
 }

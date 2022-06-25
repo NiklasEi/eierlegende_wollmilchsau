@@ -12,7 +12,7 @@ impl Plugin for LoadingPlugin {
             .with_collection::<FontAssets>()
             .with_collection::<AudioAssets>()
             .with_collection::<TextureAssets>()
-            .continue_to_state(GameState::Menu)
+            .continue_to_state(GameState::Playing)
             .build(app);
     }
 }
@@ -27,8 +27,20 @@ pub struct FontAssets {
 pub struct AudioAssets {
     #[asset(path = "audio/background.ogg")]
     pub background: Handle<AudioSource>,
-    #[asset(path = "audio/chicken_hatch.ogg")]
-    pub chicken_hatch: Handle<AudioSource>,
+    #[asset(path = "audio/chicken.ogg")]
+    pub chicken: Handle<AudioSource>,
+    #[asset(path = "audio/duck.ogg")]
+    pub duck: Handle<AudioSource>,
+    #[asset(path = "audio/goat.ogg")]
+    pub goat: Handle<AudioSource>,
+    #[asset(path = "audio/sheep.ogg")]
+    pub sheep: Handle<AudioSource>,
+    #[asset(path = "audio/pig.ogg")]
+    pub pig: Handle<AudioSource>,
+    #[asset(path = "audio/cow.ogg")]
+    pub cow: Handle<AudioSource>,
+    #[asset(path = "audio/yipee.ogg")]
+    pub yipee: Handle<AudioSource>,
 }
 
 #[derive(AssetCollection)]

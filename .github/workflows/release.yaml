@@ -99,6 +99,42 @@ jobs:
           tag: ${{ github.ref }}
           overwrite: true
 
+  build-linux-18:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - name: Get tag
+        id: tag
+        uses: dawidd6/action-get-tag@v1
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Install rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Install Dependencies
+        run: sudo apt-get update; sudo apt-get install pkg-config libx11-dev libasound2-dev libudev-dev
+      - name: Build release
+        run: |
+          cargo build --release
+      - name: Prepare release
+        run: |
+          strip target/release/${{ env.GAME_EXECUTABLE_NAME }}
+          chmod +x target/release/${{ env.GAME_EXECUTABLE_NAME }}
+          mv target/release/${{ env.GAME_EXECUTABLE_NAME }} .
+      - name: Bundle release
+        run: |
+          tar -czf ${{ env.GAME_EXECUTABLE_NAME }}_linux.tar.gz ${{ env.GAME_EXECUTABLE_NAME }} assets credits
+      - name: Upload release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ env.GAME_EXECUTABLE_NAME }}_linux.tar.gz
+          asset_name: ${{ env.GAME_EXECUTABLE_NAME }}_${{ steps.tag.outputs.tag }}_linux_older_glibc.tar.gz
+          tag: ${{ github.ref }}
+          overwrite: true
+
   build-windows:
     runs-on: windows-latest
 
