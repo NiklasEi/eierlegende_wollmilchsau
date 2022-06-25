@@ -219,7 +219,7 @@ checksum = "904dfeac50f3cdaba28fc6f57fdcddb75f49ed61346676a78c4ffe55877802fd"
 [[package]]
 name = "bevy"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "bevy_dylib",
  "bevy_internal",
@@ -228,7 +228,7 @@ dependencies = [
 [[package]]
 name = "bevy-crevice-derive"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "bevy_macro_utils",
  "proc-macro2",
@@ -263,7 +263,7 @@ dependencies = [
 [[package]]
 name = "bevy_app"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "bevy_derive",
  "bevy_ecs",
@@ -276,7 +276,7 @@ dependencies = [
 [[package]]
 name = "bevy_asset"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "anyhow",
  "bevy_app",
@@ -337,7 +337,7 @@ dependencies = [
 [[package]]
 name = "bevy_core"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "bevy_app",
  "bevy_derive",
@@ -352,7 +352,7 @@ dependencies = [
 [[package]]
 name = "bevy_core_pipeline"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -365,7 +365,7 @@ dependencies = [
 [[package]]
 name = "bevy_crevice"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "bevy-crevice-derive",
  "bytemuck",
@@ -376,7 +376,7 @@ dependencies = [
 [[package]]
 name = "bevy_derive"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "bevy_macro_utils",
  "quote",
@@ -386,7 +386,7 @@ dependencies = [
 [[package]]
 name = "bevy_diagnostic"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "bevy_app",
  "bevy_core",
@@ -398,7 +398,7 @@ dependencies = [
 [[package]]
 name = "bevy_dylib"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "bevy_internal",
 ]
@@ -406,7 +406,7 @@ dependencies = [
 [[package]]
 name = "bevy_ecs"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "async-channel",
  "bevy_ecs_macros",
@@ -423,7 +423,7 @@ dependencies = [
 [[package]]
 name = "bevy_ecs_macros"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "bevy_macro_utils",
  "proc-macro2",
@@ -461,7 +461,7 @@ dependencies = [
 [[package]]
 name = "bevy_gltf"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "anyhow",
  "base64",
@@ -486,7 +486,7 @@ dependencies = [
 [[package]]
 name = "bevy_hierarchy"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -498,7 +498,7 @@ dependencies = [
 [[package]]
 name = "bevy_input"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -509,7 +509,7 @@ dependencies = [
 [[package]]
 name = "bevy_internal"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -553,7 +553,7 @@ dependencies = [
 [[package]]
 name = "bevy_log"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "android_log-sys",
  "bevy_app",
@@ -567,7 +567,7 @@ dependencies = [
 [[package]]
 name = "bevy_macro_utils"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "cargo-manifest",
  "quote",
@@ -577,7 +577,7 @@ dependencies = [
 [[package]]
 name = "bevy_math"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "bevy_reflect",
  "glam",
@@ -586,7 +586,7 @@ dependencies = [
 [[package]]
 name = "bevy_pbr"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -606,7 +606,7 @@ dependencies = [
 [[package]]
 name = "bevy_reflect"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "bevy_reflect_derive",
  "bevy_utils",
@@ -622,7 +622,7 @@ dependencies = [
 [[package]]
 name = "bevy_reflect_derive"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "bevy_macro_utils",
  "proc-macro2",
@@ -634,7 +634,7 @@ dependencies = [
 [[package]]
 name = "bevy_render"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "anyhow",
  "bevy_app",
@@ -669,7 +669,7 @@ dependencies = [
 [[package]]
 name = "bevy_scene"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "anyhow",
  "bevy_app",
@@ -687,7 +687,7 @@ dependencies = [
 [[package]]
 name = "bevy_sprite"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -712,7 +712,7 @@ dependencies = [
 [[package]]
 name = "bevy_tasks"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "async-channel",
  "async-executor",
@@ -725,7 +725,7 @@ dependencies = [
 [[package]]
 name = "bevy_text"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "ab_glyph",
  "anyhow",
@@ -748,7 +748,7 @@ dependencies = [
 [[package]]
 name = "bevy_transform"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -760,7 +760,7 @@ dependencies = [
 [[package]]
 name = "bevy_ui"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -788,7 +788,7 @@ dependencies = [
 [[package]]
 name = "bevy_utils"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "ahash",
  "bevy_derive",
@@ -802,7 +802,7 @@ dependencies = [
 [[package]]
 name = "bevy_window"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -815,7 +815,7 @@ dependencies = [
 [[package]]
 name = "bevy_winit"
 version = "0.7.0"
-source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#1ae37cc4a8fe702dc547771dfa8b144517d2ff8d"
+source = "git+https://github.com/NiklasEi/bevy?branch=eierlegende-wollmilchsau#61f41bd2c56a4728e6d2d2ec0abc7b0c4f0fe027"
 dependencies = [
  "approx",
  "bevy_app",
