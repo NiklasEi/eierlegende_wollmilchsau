@@ -1,3 +1,4 @@
+mod actions;
 mod animal;
 mod audio;
 mod farm;
@@ -9,6 +10,7 @@ use crate::audio::InternalAudioPlugin;
 use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
 
+use crate::actions::ActionPlugin;
 use crate::animal::AnimalPlugin;
 use crate::farm::{CurrentMaxEggs, FarmPlugin};
 use crate::ui::{Score, UiPlugin};
@@ -42,7 +44,8 @@ impl Plugin for GamePlugin {
             .add_plugin(FarmPlugin)
             .add_plugin(AnimalPlugin)
             .add_plugin(InternalAudioPlugin)
-            .add_plugin(UiPlugin);
+            .add_plugin(UiPlugin)
+            .add_plugin(ActionPlugin);
 
         #[cfg(debug_assertions)]
         {
@@ -53,6 +56,11 @@ impl Plugin for GamePlugin {
                 .add_plugin(WorldInspectorPlugin::new());
         }
     }
+}
+
+#[derive(SystemLabel, Clone, Hash, Debug, Eq, PartialEq)]
+pub enum ShmooLabels {
+    ProcessActions,
 }
 
 #[derive(Component)]

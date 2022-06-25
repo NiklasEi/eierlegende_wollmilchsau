@@ -1,9 +1,9 @@
+use crate::actions::Actions;
 use crate::audio::HatchEvent;
 use crate::farm::{get_animal_in_reach, CurrentEggs, Egg};
 use crate::loading::TextureAssets;
-use crate::{GameState, MainCamera, ANIMAL_SIZE, UI_WIDTH, WINDOW_HEIGHT, WINDOW_WIDTH};
+use crate::{GameState, ShmooLabels, ANIMAL_SIZE, UI_WIDTH, WINDOW_HEIGHT, WINDOW_WIDTH};
 use bevy::prelude::*;
-use bevy::render::camera::RenderTarget;
 use rand::random;
 use strum::EnumIter;
 
@@ -14,10 +14,14 @@ impl Plugin for AnimalPlugin {
         app.add_system_set(
             SystemSet::on_update(GameState::Playing)
                 .with_system(move_animals)
+                .with_system(update_animal_state),
+        )
+        .add_system_set(
+            SystemSet::on_update(GameState::Playing)
+                .after(ShmooLabels::ProcessActions)
                 .with_system(pick_up_animal)
                 .with_system(move_picked_animal)
-                .with_system(drop_animal)
-                .with_system(update_animal_state),
+                .with_system(drop_animal),
         );
     }
 }
@@ -186,13 +190,9 @@ fn move_animals(
     }
 }
 
-fn move_picked_animal(
-    mut animal: Query<&mut Transform, With<Picked>>,
-    windows: Res<Windows>,
-    cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
-) {
+fn move_picked_animal(mut animal: Query<&mut Transform, With<Picked>>, actions: Res<Actions>) {
     if let Ok(mut transform) = animal.get_single_mut() {
-        if let Some(position) = get_world_coordinates(&windows, &cameras) {
+        if let Some(position) = actions.position {
             transform.translation.x = position.x;
             transform.translation.y = position.y;
 
@@ -219,14 +219,12 @@ fn pick_up_animal(
     mut current_eggs: ResMut<CurrentEggs>,
     animals: Query<(Entity, &Transform, &Animal), Without<Picked>>,
     eggs: Query<(Entity, &Transform), (Without<Animal>, With<Egg>)>,
-    windows: Res<Windows>,
-    cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
-    mouse_input: Res<Input<MouseButton>>,
+    actions: Res<Actions>,
 ) {
-    if !mouse_input.just_pressed(MouseButton::Left) {
+    if !actions.just_pressed {
         return;
     }
-    if let Some(position) = get_world_coordinates(&windows, &cameras) {
+    if let Some(position) = actions.position {
         for (egg, egg_position) in eggs.iter() {
             if position.distance(Vec2::new(
                 egg_position.translation.x,
@@ -258,17 +256,15 @@ fn drop_animal(
     mut commands: Commands,
     time: Res<Time>,
     textures: Res<TextureAssets>,
-    mouse_input: Res<Input<MouseButton>>,
     animals: Query<(Entity, &Transform, &Animal), Without<Picked>>,
     picked_animal: Query<(Entity, &Animal), With<Picked>>,
-    windows: Res<Windows>,
-    cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
+    actions: Res<Actions>,
 ) {
-    if !mouse_input.just_released(MouseButton::Left) {
+    if !actions.just_released {
         return;
     }
     if let Ok((picked_animal_entity, picked_animal)) = picked_animal.get_single() {
-        if let Some(position) = get_world_coordinates(&windows, &cameras) {
+        if let Some(position) = actions.position {
             if let Some(dropped_on_animal) =
                 get_animal_in_reach(&animals, &position, ANIMAL_SIZE / 2.)
             {
@@ -302,26 +298,4 @@ fn drop_animal(
             commands.entity(picked_animal_entity).remove::<Picked>();
         }
     }
-}
-
-// See https://bevy-cheatbook.github.io/cookbook/cursor2world.html
-fn get_world_coordinates(
-    windows: &Res<Windows>,
-    cameras: &Query<(&Camera, &GlobalTransform), With<MainCamera>>,
-) -> Option<Vec2> {
-    let (camera, camera_transform) = cameras.single();
-    let wnd = if let RenderTarget::Window(id) = camera.target {
-        windows.get(id).unwrap()
-    } else {
-        windows.get_primary().unwrap()
-    };
-    if let Some(screen_pos) = wnd.cursor_position() {
-        let window_size = Vec2::new(wnd.width() as f32, wnd.height() as f32);
-        let ndc = (screen_pos / window_size) * 2.0 - Vec2::ONE;
-        let ndc_to_world = camera_transform.compute_matrix() * camera.projection_matrix.inverse();
-        let world_pos = ndc_to_world.project_point3(ndc.extend(-1.0));
-        return Some(world_pos.truncate());
-    }
-
-    None
 }
