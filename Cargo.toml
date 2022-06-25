@@ -40,5 +40,8 @@ strum = { version = "0.24", features = ["derive"] }
 [target.'cfg(target_os = "linux")'.dependencies]
 winit = { version = "0.25", features=["x11"]}
 
+[patch.crates-io]
+winit = { git = "https://github.com/ryo33/winit", rev = "8f57eed3e3af4bd8b437a3e8281af47f84291c09" }
+
 [build-dependencies]
 embed-resource = "1.4"

@@ -3856,8 +3856,7 @@ dependencies = [
 [[package]]
 name = "winit"
 version = "0.26.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b43cc931d58b99461188607efd7acb2a093e65fc621f54cad78517a6063e73a"
+source = "git+https://github.com/ryo33/winit?rev=8f57eed3e3af4bd8b437a3e8281af47f84291c09#8f57eed3e3af4bd8b437a3e8281af47f84291c09"
 dependencies = [
  "bitflags",
  "cocoa",
@@ -3870,16 +3869,16 @@ dependencies = [
  "libc",
  "log",
  "mio 0.8.3",
- "ndk 0.5.0",
- "ndk-glue 0.5.2",
- "ndk-sys 0.2.2",
+ "ndk 0.6.0",
+ "ndk-glue 0.6.2",
+ "ndk-sys 0.3.0",
  "objc",
- "parking_lot 0.11.2",
+ "parking_lot 0.12.1",
  "percent-encoding",
  "raw-window-handle 0.4.3",
  "wasm-bindgen",
  "web-sys",
- "winapi",
+ "windows-sys",
  "x11-dl",
 ]
 
